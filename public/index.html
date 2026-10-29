@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Spectrum Clicks</title>
+<style>
+:root{--bg:#f6f3ee;--fg:#1c1a17;--mut:#7a746a;--line:#ddd6ca;--acc:#8a6d3b;--card:#fff;color-scheme:light}
+@media(prefers-color-scheme:dark){:root{--bg:#121110;--fg:#efeae1;--mut:#9a9387;--line:#2b2824;--acc:#c9a76a;--card:#1b1a18;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:300 16px/1.6 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+header{text-align:center;padding:72px 20px 40px}
+h1{font:400 clamp(2.4rem,7vw,4.2rem)/1.1 "Cormorant Garamond",Georgia,serif;letter-spacing:.04em;margin:0 0 12px}
+header p{margin:0;color:var(--mut);letter-spacing:.18em;text-transform:uppercase;font-size:.75rem}
+header i{display:block;width:48px;height:1px;background:var(--acc);margin:28px auto 0}
+[hidden]{display:none!important}
+#admin{max-width:900px;margin:0 auto 28px;padding:12px 16px;border:1px solid var(--line);background:var(--card);display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:center;font-size:.85rem}
+.btn{font:500 .75rem system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;padding:10px 18px;border:1px solid var(--acc);background:transparent;color:var(--fg);cursor:pointer}
+.btn:hover{background:var(--acc);color:var(--bg)}
+#st{color:var(--mut)}
+[contenteditable]{outline:1px dashed var(--acc);outline-offset:6px}
+main{max-width:1280px;margin:0 auto;padding:0 20px 80px}
+#grid{columns:3 280px;column-gap:20px}
+figure{margin:0 0 20px;break-inside:avoid;position:relative;background:var(--card);padding:10px 10px 6px;border:1px solid var(--line);transition:transform .3s,box-shadow .3s}
+figure:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,.14)}
+figure img{display:block;width:100%;height:auto;cursor:zoom-in}
+figcaption{font:italic 400 1.05rem "Cormorant Garamond",Georgia,serif;text-align:center;padding:10px 4px 6px;color:var(--mut);text-transform:capitalize;min-height:1.6em}
+figcaption[contenteditable]:empty::before{content:"Add a caption";opacity:.5}
+.del{position:absolute;top:16px;right:16px;border:0;background:rgba(0,0,0,.65);color:#fff;padding:6px 10px;cursor:pointer;font-size:.8rem}
+#empty{text-align:center;color:var(--mut);padding:60px 0;font:italic 1.3rem "Cormorant Garamond",Georgia,serif}
+footer{text-align:center;color:var(--mut);font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;padding:0 0 40px}
+footer a{color:inherit;cursor:pointer;text-decoration:underline}
+#login{display:flex;gap:8px;justify-content:center;margin-top:14px}
+#login input{padding:9px 12px;border:1px solid var(--line);background:var(--card);color:var(--fg);font:inherit}
+#lb{position:fixed;inset:0;background:rgba(10,9,8,.96);display:none;align-items:center;justify-content:center;padding:20px;z-index:20;flex-direction:column;gap:12px}
+#lb.on{display:flex}
+#lb img{max-width:100%;max-height:calc(100% - 50px);object-fit:contain}
+#lbc{color:#d8d2c6;font:italic 1.2rem "Cormorant Garamond",Georgia,serif;text-transform:capitalize}
+#lb button{position:absolute;background:none;border:0;color:#d8d2c6;font-size:2.2rem;cursor:pointer;padding:12px}
+#lbx{top:8px;right:12px}#lbp{left:8px;top:50%}#lbn{right:8px;top:50%}
+
+nav{display:flex;justify-content:center;gap:clamp(18px,6vw,56px);padding:16px 20px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:10}
+nav a{color:var(--fg);text-decoration:none;font:500 .75rem system-ui,sans-serif;letter-spacing:.18em;text-transform:uppercase;padding:6px 2px;border-bottom:1px solid transparent}
+nav a:hover,nav a.on{color:var(--acc);border-color:var(--acc)}
+header{padding-top:48px}
+.feat{position:absolute;top:16px;left:16px;border:0;background:rgba(0,0,0,.65);color:#fff;padding:6px 10px;cursor:pointer;font-size:.8rem}
+#reqview{max-width:620px;margin:0 auto}
+#reqview h2{font:400 2rem "Cormorant Garamond",Georgia,serif;text-align:center;margin:0 0 8px}
+#reqview>p{text-align:center;color:var(--mut);margin:0 0 24px}
+#reqform{display:flex;flex-direction:column;gap:12px}
+#reqform input,#reqform textarea{padding:12px 14px;border:1px solid var(--line);background:var(--card);color:var(--fg);font:inherit;width:100%}
+#reqform .btn{align-self:flex-start}
+.hp{position:absolute!important;left:-9999px}
+#rmsg{color:var(--mut);font-size:.9rem}
+#reqadmin{margin-top:56px;border-top:1px solid var(--line);padding-top:32px}
+.req{border:1px solid var(--line);background:var(--card);padding:14px 16px;margin-bottom:12px}
+.req time{display:block;color:var(--mut);font-size:.75rem;margin-bottom:6px}
+.req p{margin:0 0 10px;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<nav id="nav"><a href="#home" data-v="home">Home</a><a href="#all" data-v="all">All Images</a><a href="#request" data-v="request">Request</a></nav>
+<header>
+  <h1 id="title"></h1>
+  <p id="sub"></p>
+  <i></i>
+</header>
+<main>
+  <div id="admin" hidden>
+    <span>Owner mode</span>
+    <label class="btn">Add photos<input id="file" type="file" accept="image/*" multiple hidden></label>
+    <button class="btn" id="savetxt">Save title</button>
+    <button class="btn" id="logout">Log out</button>
+    <span id="st"></span>
+  </div>
+  <div id="grid"></div>
+  <div id="empty" hidden></div>
+  <section id="reqview" hidden>
+    <h2>Request a picture</h2>
+    <p>Would you like to see a particular subject, place or photo on this site? Send a request and I will consider adding it.</p>
+    <form id="reqform">
+      <input name="name" placeholder="Your name" maxlength="80" required>
+      <input name="email" type="email" placeholder="Email (optional, so I can reply)" maxlength="120">
+      <textarea name="message" rows="5" maxlength="1000" placeholder="Which pictures would you like to see?" required></textarea>
+      <input name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <button class="btn">Send request</button>
+      <span id="rmsg"></span>
+    </form>
+    <div id="reqadmin" hidden><h2>Requests received</h2><div id="reqlist"></div></div>
+  </section>
+</main>
+<footer>
+  &copy; Spectrum Clicks &middot; <a id="loginlink">Owner login</a>
+  <form id="login" hidden><input id="pw" type="password" placeholder="Password" autocomplete="current-password"><button class="btn">Enter</button></form>
+</footer>
+<div id="lb"><button id="lbx" aria-label="Close">&times;</button><button id="lbp" aria-label="Previous">&lsaquo;</button><button id="lbn" aria-label="Next">&rsaquo;</button><img id="lbi" alt=""><div id="lbc"></div></div>
+<script type="module">
+const $ = s => document.querySelector(s);
+let D = { title: '', sub: '', photos: [], admin: false }, idx = 0;
+let view = 'home', cur = [];
+
+async function api(url, opt = {}) {
+  const r = await fetch(url, { headers: { 'Content-Type': 'application/json' }, ...opt });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error || `Server error ${r.status} on ${url.split('?')[0]}`);
+  return j;
+}
+const status = m => $('#st').textContent = m;
+async function load() {
+  D = await api('/api/photos');
+  if (!Array.isArray(D.photos)) throw new Error('/api/photos is not responding as expected. Check that the api folder was deployed.');
+  render();
+}
+
+function render() {
+  const t = $('#title'), s = $('#sub');
+  t.textContent = D.title; s.textContent = D.sub; document.title = D.title;
+  [t, s].forEach(e => D.admin ? e.setAttribute('contenteditable', 'plaintext-only') : e.removeAttribute('contenteditable'));
+  const g = $('#grid'); g.innerHTML = '';
+  const list = view === 'home' ? D.photos.filter(p => p.featured) : D.photos;
+  cur = list;
+  list.forEach((p, i) => {
+    const f = document.createElement('figure'), im = new Image();
+    im.loading = 'lazy'; im.src = p.url; im.alt = p.cap || ''; im.onclick = () => show(i);
+    f.append(im);
+    if (p.cap || D.admin) {
+      const c = document.createElement('figcaption'); c.textContent = p.cap || '';
+      if (D.admin) {
+        c.setAttribute('contenteditable', 'plaintext-only');
+        c.onblur = () => {
+          const v = c.textContent.trim();
+          if (v !== (p.cap || '')) { p.cap = v; api('/api/admin', { method: 'POST', body: JSON.stringify({ caps: { [p.pathname]: v } }) }).catch(e => status(e.message)); }
+        };
+        c.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); c.blur(); } };
+      }
+      f.append(c);
+    }
+    if (D.admin) {
+      const fb = document.createElement('button'); fb.className = 'feat'; fb.textContent = p.featured ? '★ Featured' : '☆ Feature';
+      fb.onclick = async e => { e.stopPropagation(); try { await api('/api/admin', { method: 'POST', body: JSON.stringify({ featured: { [p.pathname]: !p.featured } }) }); await load(); } catch (err) { status(err.message); } };
+      f.append(fb);
+      const b = document.createElement('button'); b.className = 'del'; b.textContent = 'Remove';
+      b.onclick = async e => {
+        e.stopPropagation();
+        if (!confirm('Remove this photo permanently?')) return;
+        try { await api('/api/admin?url=' + encodeURIComponent(p.url), { method: 'DELETE' }); await load(); } catch (err) { status(err.message); }
+      };
+      f.append(b);
+    }
+    g.append(f);
+  });
+  const isReq = view === 'request';
+  $('#grid').hidden = isReq; $('#reqview').hidden = !isReq; $('#reqadmin').hidden = !D.admin;
+  const e = $('#empty');
+  e.hidden = isReq || list.length > 0;
+  e.textContent = view === 'home'
+    ? (D.admin ? 'No featured pictures yet. Open All Images and press ☆ Feature on your favourites.' : 'Featured pictures are coming soon.')
+    : (D.admin ? 'Your gallery is empty — add your first photos above.' : 'New work coming soon.');
+  if (isReq && D.admin) loadReqs();
+  $('#admin').hidden = !D.admin;
+  $('#loginlink').hidden = D.admin;
+  if (D.admin) $('#login').hidden = true;
+}
+
+$('#file').onchange = async e => {
+  const files = [...e.target.files]; e.target.value = '';
+  let n = 0;
+  for (const f of files) {
+    status(`Uploading ${++n} of ${files.length}…`);
+    try { const { upload } = await import('https://esm.sh/@vercel/blob@2.0.0/client'); await upload('photos/' + f.name, f, { access: 'public', handleUploadUrl: '/api/upload' }); }
+    catch (err) { status(`${f.name}: ${err.message}`); await new Promise(r => setTimeout(r, 2000)); }
+  }
+  await load(); status('');
+};
+$('#savetxt').onclick = async () => {
+  try {
+    await api('/api/admin', { method: 'POST', body: JSON.stringify({ title: $('#title').textContent.trim(), sub: $('#sub').textContent.trim() }) });
+    status('Saved'); setTimeout(() => status(''), 1500);
+  } catch (e) { status(e.message); }
+};
+$('#loginlink').onclick = () => { $('#login').hidden = false; $('#pw').focus(); };
+$('#login').onsubmit = async e => {
+  e.preventDefault();
+  try { await api('/api/auth', { method: 'POST', body: JSON.stringify({ password: $('#pw').value }) }); $('#pw').value = ''; await load(); }
+  catch (err) { alert(err.message); }
+};
+$('#logout').onclick = async () => { await api('/api/auth', { method: 'DELETE' }); await load(); };
+
+function show(i) {
+  idx = (i + cur.length) % cur.length;
+  const p = cur[idx];
+  $('#lbi').src = p.url; $('#lbc').textContent = p.cap || '';
+  $('#lb').classList.add('on');
+}
+$('#lbx').onclick = () => $('#lb').classList.remove('on');
+$('#lbp').onclick = () => show(idx - 1);
+$('#lbn').onclick = () => show(idx + 1);
+$('#lb').onclick = e => { if (e.target.id === 'lb') $('#lb').classList.remove('on'); };
+document.addEventListener('keydown', e => {
+  if (!$('#lb').classList.contains('on')) return;
+  if (e.key === 'Escape') $('#lb').classList.remove('on');
+  if (e.key === 'ArrowLeft') show(idx - 1);
+  if (e.key === 'ArrowRight') show(idx + 1);
+});
+function setView() {
+  const h = location.hash.slice(1);
+  view = ['home', 'all', 'request'].includes(h) ? h : 'home';
+  document.querySelectorAll('#nav a').forEach(a => a.classList.toggle('on', a.dataset.v === view));
+}
+window.addEventListener('hashchange', () => { setView(); render(); window.scrollTo(0, 0); });
+
+$('#reqform').onsubmit = async e => {
+  e.preventDefault();
+  const msg = $('#rmsg'); msg.textContent = 'Sending…';
+  try {
+    await api('/api/request', { method: 'POST', body: JSON.stringify(Object.fromEntries(new FormData(e.target))) });
+    e.target.reset(); msg.textContent = 'Thank you! Your request has been sent.';
+  } catch (err) { msg.textContent = err.message; }
+};
+async function loadReqs() {
+  const box = $('#reqlist');
+  try {
+    const { requests } = await api('/api/request');
+    box.innerHTML = '';
+    if (!requests.length) { box.textContent = 'No requests yet.'; return; }
+    requests.forEach(q => {
+      const d = document.createElement('div'); d.className = 'req';
+      const h = document.createElement('strong'); h.textContent = (q.name || 'Anonymous') + (q.email ? ' · ' + q.email : '');
+      const t = document.createElement('time'); t.textContent = new Date(q.createdAt).toLocaleString();
+      const p = document.createElement('p'); p.textContent = q.message;
+      const b = document.createElement('button'); b.className = 'btn'; b.textContent = 'Done — delete';
+      b.onclick = async () => { try { await api('/api/request?url=' + encodeURIComponent(q.url), { method: 'DELETE' }); loadReqs(); } catch (err) { status(err.message); } };
+      d.append(h, t, p, b); box.append(d);
+    });
+  } catch (err) { box.textContent = err.message; }
+}
+setView();
+load().catch(e => { const m = $('#empty'); m.hidden = false; m.textContent = 'Could not load the gallery: ' + e.message; });
+</script>
+</body>
+</html>
